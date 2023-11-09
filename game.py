@@ -35,11 +35,31 @@ def play(all_board = None, global_board = None, curr_player = 0, i = None, j = N
         curr_player += 1
         curr_player %= 2
         all_board, global_board, result = check_big_board(all_board, global_board)
-        if global_board[i][j] != [1, 0, 0]: i, j = None, None
 
     if verbose: system('clear')
     if verbose: print_board(all_board, global_board)
     return result
+
+def play_step(all_board, global_board, next_position, player = 0):
+    if len(next_position) == 2:
+        i, j = next_position
+        i, j, k, l = random_player(all_board, global_board, i, j)
+    else:
+        i, j, k, l = next_position
+
+    if player == 0: all_board[i][j][k][l] = [0, 1, 0]
+    else: all_board[i][j][k][l] = [0, 0, 1]
+    i, j = k, l
+    all_board, global_board, result = check_big_board(all_board, global_board)
+
+    reward = 1
+    if result is not None:
+        if result == 'draw': reward = 50
+        elif result == 'X won' and player == 0: reward = 100
+        elif result == 'O won' and player == 1: reward = 100
+        else: reward = -50
+
+    return all_board, global_board, reward, i, j
 
 if __name__ == '__main__':
     SIMS = 10000

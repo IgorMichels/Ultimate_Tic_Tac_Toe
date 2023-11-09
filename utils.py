@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 def generate_board():
     all_board = [
@@ -52,15 +53,41 @@ def get_avaliabe_spaces(board):
     return avaliable_spaces
 
 def boards_to_array(all_board, global_board):
-    return np.hstack([np.argmax(all_board, axis=-1).flatten(),
-                      np.argmax(global_board, axis=-1).flatten()])
+    board = np.hstack([np.argmax(all_board, axis=-1).flatten(),
+                       np.argmax(global_board, axis=-1).flatten()])
+    board = tf.convert_to_tensor(board, dtype=tf.float32)
+    board = tf.expand_dims(board, axis=0)
+    return board
 
-if __name__ == '__main__':
-    all_board, global_board = generate_board()
-    global_board[0][0] = [0, 1, 0]
-    global_board[0][1] = [0, 1, 0]
-    global_board[0][2] = [0, 1, 0]
-    all_board, global_board, result = check_big_board(all_board, global_board)
-    print(result)
-    print(boards_to_array(all_board, global_board).shape)
+def move_to_idx(move):
+    i = move // 27
+    move = move % 27
+    j = move // 9
+    move = move % 9
+    k = move // 3
+    move = move % 3
+    l = move % 3
+
+    return i, j, k, l
+
+def idx_to_move(i, j, k, l):
+    move = 3 * k + l
+    move += 9 * j
+    move += 27 * i
+    return move
+
+def get_possible_moves(all_board, global_board, i, j):
+    possible_moves = np.zeros(81)
+    if i is not None:
+        spaces = get_avaliabe_spaces(all_board[i][j])
+        if len(spaces) > 0:
+            for k, l in spaces: possible_moves[idx_to_move(i, j, k, l)] = 1
+            return possible_moves
     
+    possible_subgrids = get_avaliabe_spaces(global_board)
+    for i, j in possible_subgrids:
+        spaces = get_avaliabe_spaces(all_board[i][j])
+        if len(spaces) > 0:
+            for k, l in spaces: possible_moves[idx_to_move(i, j, k, l)] = 1
+    
+    return possible_moves
