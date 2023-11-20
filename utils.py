@@ -55,8 +55,8 @@ def get_avaliabe_spaces(board):
 def boards_to_array(all_board, global_board):
     board = np.hstack([np.argmax(all_board, axis=-1).flatten(),
                        np.argmax(global_board, axis=-1).flatten()])
-    board = tf.convert_to_tensor(board, dtype=tf.float32)
-    board = tf.expand_dims(board, axis=0)
+    # board = tf.convert_to_tensor(board, dtype=tf.float32)
+    # board = tf.expand_dims(board, axis=0)
     return board
 
 def move_to_idx(move):
@@ -78,13 +78,13 @@ def idx_to_move(i, j, k, l):
 
 def get_possible_moves(all_board, global_board, i, j):
     possible_moves = np.zeros(81)
-    if i is not None:
+    possible_subgrids = get_avaliabe_spaces(global_board)
+    if i is not None and [i, j] in possible_subgrids:
         spaces = get_avaliabe_spaces(all_board[i][j])
         if len(spaces) > 0:
             for k, l in spaces: possible_moves[idx_to_move(i, j, k, l)] = 1
             return possible_moves
     
-    possible_subgrids = get_avaliabe_spaces(global_board)
     for i, j in possible_subgrids:
         spaces = get_avaliabe_spaces(all_board[i][j])
         if len(spaces) > 0:

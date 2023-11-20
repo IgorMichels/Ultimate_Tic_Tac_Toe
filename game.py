@@ -59,7 +59,7 @@ def play_step(all_board, global_board, next_position, player = 0):
         elif result == 'O won' and player == 1: reward = 100
         else: reward = -50
 
-    return all_board, global_board, reward, i, j
+    return all_board, global_board, reward, (i, j)
 
 if __name__ == '__main__':
     SIMS = 10000

@@ -1,8 +1,12 @@
 from utils import get_avaliabe_spaces, boards_to_array, get_possible_moves, move_to_idx
+from torch.distributions import Categorical
 from game_display import print_board
 from random import choice
 
+import torch
 import numpy as np
+
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 def human_player(all_board, global_board, i, j):
     print_board(all_board, global_board)
@@ -43,15 +47,38 @@ def random_player(all_board, global_board, i, j):
     k, l = choice(avaliable_spaces)
     return i, j, k, l
 
-def trained_player(all_board, global_board, i, j, agent, eps):
-    state = boards_to_array(all_board, global_board)
+def trained_player(all_board, global_board, next_action_basis, actor, eps):
+    i, j = next_action_basis
     possible_moves = get_possible_moves(all_board, global_board, i, j)
+    
+    state = boards_to_array(all_board, global_board)
+    state = torch.from_numpy(state).float().unsqueeze(0).to(DEVICE)
 
-    probs = agent(state)
-    probs = probs.numpy().flatten()
-    probs = probs * possible_moves
-    probs = probs / sum(probs)
-    if np.random.random() < eps: move = np.random.choice(81, p=probs)
-    else: move = np.argmax(probs)
-    i, j, k, l = move_to_idx(move)
-    return i, j, k, l
+    probs = actor(state)
+    probs = torch.nan_to_num(probs)
+    probs = probs * torch.Tensor(possible_moves)
+    s = torch.sum(probs)
+    if s.item() == 0:
+        probs = (1 - probs) * torch.Tensor(possible_moves)
+        s = torch.sum(probs)
+
+    probs = probs / s
+    
+    m = Categorical(probs)
+    if np.random.random() < eps: action = m.sample()
+    else: action = torch.argmax(probs)
+    
+    i, j, k, l = move_to_idx(action.item())
+
+    return (i, j, k, l), m.log_prob(action)
+
+    # if np.random.random() < eps: action = np.random.choice(81, p=probs)
+    # else: action = np.argmax(probs)
+    # action_prob = probs[action]
+    
+    # i, j, k, l = move_to_idx(action)
+    # return (i, j, k, l), np.log(action_prob)
+
+def evaluate_board(all_board, global_board, critic):
+    state = boards_to_array(all_board, global_board)
+    return critic(state)
