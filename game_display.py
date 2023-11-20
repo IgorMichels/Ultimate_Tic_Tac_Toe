@@ -29,15 +29,3 @@ def print_board(board, global_board):
         
         print('\n'.join(lines))
         if i != 2: print(horizontal_div)
-
-if __name__ == '__main__':
-    from utils import generate_board
-
-    all_board, global_board = generate_board()
-    all_board = np.array(all_board)
-    global_board = np.array(global_board)
-    all_board[0][0][0][0] = [0, 0, 1]
-    global_board[1][1] = [0, 0, 1]
-    global_board[2][1] = [0, 1, 0]
-    global_board[2][2] = [0, 0, 0]
-    print_board(all_board, global_board)

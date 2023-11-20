@@ -10,7 +10,7 @@ from os import system
 
 import numpy as np
 
-def play(all_board = None, global_board = None, curr_player = 0, i = None, j = None, player_0 = random_player, player_1 = random_player, verbose = False):
+def play(all_board=None, global_board=None, curr_player=0, i=None, j=None, player_0=random_player, player_1=random_player, verbose=False):
     players = [[0, 1, 0], [0, 0, 1]]
     result = None
     if all_board is None:
@@ -64,25 +64,8 @@ def play_step(all_board, global_board, next_position, player = 0):
 if __name__ == '__main__':
     SIMS = 10000
     t0 = time()
-    all_board, global_board, i, j = None, None, None, None
-    curr_player = 0
-    # all_board, global_board = generate_board()
-    # # i, j = None, None
-    # i, j = 0, 0
-    # global_board[i][j] = [0, 1, 0]
-    # i, j = 1, 0
-    # global_board[i][j] = [0, 1, 0]
-    # i, j = 1, 1
-    # global_board[i][j] = [0, 1, 0]
-    # i, j = 2, 1
-    # global_board[i][j] = [0, 1, 0]
-    # i, j = 2, 2
-    # all_board[i][j][2][2] = [0, 1, 0]
-    # curr_player = 0
-    # print_board(all_board, global_board)
-    results = [play(all_board = all_board, global_board = global_board, curr_player = curr_player, i = i, j = j) for _ in tqdm(range(SIMS))]
-    results, counts = np.unique(results, return_counts = True)
+    results = [play() for _ in tqdm(range(SIMS))]
+    results, counts = np.unique(results, return_counts=True)
     expected_reward = np.dot(counts, np.array([-1, 2, 1])) / SIMS
     tf = time()
     print(results, counts, expected_reward, f'{tf - t0:.2f} seconds')
-    

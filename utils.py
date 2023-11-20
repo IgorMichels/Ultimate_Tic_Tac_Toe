@@ -55,8 +55,6 @@ def get_avaliabe_spaces(board):
 def boards_to_array(all_board, global_board):
     board = np.hstack([np.argmax(all_board, axis=-1).flatten(),
                        np.argmax(global_board, axis=-1).flatten()])
-    # board = tf.convert_to_tensor(board, dtype=tf.float32)
-    # board = tf.expand_dims(board, axis=0)
     return board
 
 def move_to_idx(move):

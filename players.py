@@ -47,7 +47,7 @@ def random_player(all_board, global_board, i, j):
     k, l = choice(avaliable_spaces)
     return i, j, k, l
 
-def trained_player(all_board, global_board, next_action_basis, actor, eps):
+def trained_player(all_board, global_board, next_action_basis, actor, eps=0, training=False):
     i, j = next_action_basis
     possible_moves = get_possible_moves(all_board, global_board, i, j)
     
@@ -57,27 +57,22 @@ def trained_player(all_board, global_board, next_action_basis, actor, eps):
     probs = actor(state)
     probs = torch.nan_to_num(probs)
     probs = probs * torch.Tensor(possible_moves)
-    s = torch.sum(probs)
-    if s.item() == 0:
+    s0 = torch.sum(probs)
+    if s0.item() == 0:
         probs = (1 - probs) * torch.Tensor(possible_moves)
         s = torch.sum(probs)
-
-    probs = probs / s
+        probs = probs / s
+    else:
+        probs = probs / s0
     
     m = Categorical(probs)
-    if np.random.random() < eps: action = m.sample()
+    if np.random.random() < eps or s0.item() == 0: action = m.sample()
     else: action = torch.argmax(probs)
     
     i, j, k, l = move_to_idx(action.item())
 
-    return (i, j, k, l), m.log_prob(action)
-
-    # if np.random.random() < eps: action = np.random.choice(81, p=probs)
-    # else: action = np.argmax(probs)
-    # action_prob = probs[action]
-    
-    # i, j, k, l = move_to_idx(action)
-    # return (i, j, k, l), np.log(action_prob)
+    if training: return (i, j, k, l), m.log_prob(action)
+    else: return i, j, k, l
 
 def evaluate_board(all_board, global_board, critic):
     state = boards_to_array(all_board, global_board)
