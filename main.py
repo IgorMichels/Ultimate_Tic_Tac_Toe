@@ -10,11 +10,11 @@ from functions.players import trained_player
 policy_X = torch.jit.load('models/policy_X_0.pt')
 policy_O = torch.jit.load('models/policy_O_0.pt')
 
-def rl_player_X(all_board, global_board, i, j):
+def rl_player_X(all_board, global_board, i, j, **kwargs):
     next_action_basis = (i, j)
     return trained_player(all_board, global_board, next_action_basis, policy_X)
 
-def rl_player_O(all_board, global_board, i, j):
+def rl_player_O(all_board, global_board, i, j, **kwargs):
     next_action_basis = (i, j)
     return trained_player(all_board, global_board, next_action_basis, policy_O)
 
