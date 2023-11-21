@@ -1,15 +1,17 @@
-from utils import get_avaliabe_spaces, boards_to_array, get_possible_moves, move_to_idx
+from functions.utils import get_avaliabe_spaces, boards_to_array, get_possible_moves, move_to_idx
+from functions.game_display import print_board
 from torch.distributions import Categorical
-from game_display import print_board
 from random import choice
+from os import system
 
 import torch
 import numpy as np
 
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-def human_player(all_board, global_board, i, j):
-    print_board(all_board, global_board)
+def human_player(all_board, global_board, i, j, header=''):
+    system('clear')
+    print_board(all_board, global_board, header=header)
     k, l = None, None
     while True:
         try:
@@ -37,7 +39,7 @@ def human_player(all_board, global_board, i, j):
     
     return i, j, k, l
 
-def random_player(all_board, global_board, i, j):
+def random_player(all_board, global_board, i, j, **kwargs):
     if i is None or global_board[i][j] != [1, 0, 0]:
         avaliable_subgrids = get_avaliabe_spaces(global_board)
         i, j = choice(avaliable_subgrids)
@@ -47,7 +49,7 @@ def random_player(all_board, global_board, i, j):
     k, l = choice(avaliable_spaces)
     return i, j, k, l
 
-def trained_player(all_board, global_board, next_action_basis, actor, eps=0, training=False):
+def trained_player(all_board, global_board, next_action_basis, actor, eps=0, training=False, **kwargs):
     i, j = next_action_basis
     possible_moves = get_possible_moves(all_board, global_board, i, j)
     

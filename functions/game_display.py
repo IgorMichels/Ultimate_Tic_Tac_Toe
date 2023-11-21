@@ -5,7 +5,8 @@ BIG_SYMBOL_MAP = {0 : ['           ', '           ', '           ', '           
                   1 : ['   X   X   ', '    X X    ', '     X     ', '    X X    ', '   X   X   '],
                   2 : ['   OOOOO   ', '  O     O  ', '  O     O  ', '  O     O  ', '   OOOOO   ']}
 
-def print_board(board, global_board):
+def print_board(board, global_board, header=''):
+    if header != '': print(header)
     horizontal_div = '=' * 11 + '++' + '=' * 11 + '++' + '=' * 11
     for i, big_row in enumerate(board):
         lines = ['', '', '', '', '']

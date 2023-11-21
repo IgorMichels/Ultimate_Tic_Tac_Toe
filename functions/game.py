@@ -1,16 +1,17 @@
-from utils import generate_board, check_big_board
-from game_display import print_board
-from players import random_player
-from players import human_player
+from functions.utils import generate_board, check_big_board
+from functions.game_display import print_board
+from functions.players import random_player
+from functions.players import human_player
 from copy import deepcopy
 
-from time import time
-from tqdm import tqdm
 from os import system
+from tqdm import tqdm
+from time import time
+from time import sleep
 
 import numpy as np
 
-def play(all_board=None, global_board=None, curr_player=0, i=None, j=None, player_0=random_player, player_1=random_player, verbose=False):
+def play(all_board=None, global_board=None, curr_player=0, i=None, j=None, player_0=random_player, player_1=random_player, verbose=0, header=''):
     players = [[0, 1, 0], [0, 0, 1]]
     result = None
     if all_board is None:
@@ -22,13 +23,15 @@ def play(all_board=None, global_board=None, curr_player=0, i=None, j=None, playe
         global_board = deepcopy(global_board)
     
     while result is None:
-        if verbose: system('clear')
+        if verbose:
+            system('clear')
+            print_board(all_board, global_board, header=header)
+            sleep(verbose)
+
         if curr_player == 0:
-            if verbose: print('X player turn')
-            i, j, k, l = player_0(all_board, global_board, i, j)
+            i, j, k, l = player_0(all_board, global_board, i, j, header=header)
         else:
-            if verbose: print('O player turn')
-            i, j, k, l = player_1(all_board, global_board, i, j)
+            i, j, k, l = player_1(all_board, global_board, i, j, header=header)
         
         all_board[i][j][k][l] = players[curr_player]
         i, j = k, l
@@ -36,8 +39,11 @@ def play(all_board=None, global_board=None, curr_player=0, i=None, j=None, playe
         curr_player %= 2
         all_board, global_board, result = check_big_board(all_board, global_board)
 
-    if verbose: system('clear')
-    if verbose: print_board(all_board, global_board)
+    if verbose:
+        system('clear')
+        print_board(all_board, global_board, header=header)
+        sleep(verbose)
+    
     return result
 
 def play_step(all_board, global_board, next_position, player = 0):
