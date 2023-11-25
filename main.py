@@ -7,8 +7,8 @@ from functions.players import human_player
 from functions.players import random_player
 from functions.players import trained_player
 
-policy_X = torch.jit.load('models/policy_X_0.pt')
-policy_O = torch.jit.load('models/policy_O_0.pt')
+policy_X = torch.jit.load('models/policy_X.pt')
+policy_O = torch.jit.load('models/policy_O.pt')
 
 def rl_player_X(all_board, global_board, i, j, **kwargs):
     next_action_basis = (i, j)
@@ -26,6 +26,7 @@ if __name__ == '__main__':
     player_1_type = 'random'
     verbose = 0.1
     games = 10
+    s = 1
 
     for arg in sys.argv:
         if '-g' in arg:
@@ -35,6 +36,10 @@ if __name__ == '__main__':
         if '-v' in arg:
             arg = arg.split('=')[1]
             verbose = float(arg)
+
+        if '-s' in arg:
+            arg = arg.split('=')[1]
+            s = float(arg)
 
         if '-p0' in arg:
             arg = arg.split('=')[1]
@@ -60,10 +65,11 @@ if __name__ == '__main__':
                 player_1 = human_player
                 player_1_type = 'human'
     
-    for _ in range(games):
-        header = f'Stats:\nX ({player_0_type}) won: {x_won}\ndraws: {draw}\nO ({player_1_type}) won: {o_won}'
+    for game in range(games):
+        if game == 0: header = f'Historical stats:\nX ({player_0_type}) won: {x_won}\ndraws: {draw}\nO ({player_1_type}) won: {o_won}\n\nGame: {game + 1}'
+        else: header = f'Historical stats:\nX ({player_0_type}) won: {x_won} ({x_won / game:.2%})\ndraws: {draw} ({draw / game:.2%})\nO ({player_1_type}) won: {o_won} ({o_won / game:.2%})\n\nGame: {game + 1}'
         result = play(player_0=player_0, player_1=player_1, verbose=verbose, header=header)
         if result == 'X won': x_won += 1
         elif result == 'O won': o_won += 1
         else: draw += 1
-        sleep(1)
+        sleep(s)
